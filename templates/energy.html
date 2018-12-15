@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<form class="form-inline" method="POST">
+    <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-addon">Budynek</span>
+            <select name="comp_select" class="selectpicker form-control">
+                <option value="" selected disabled hidden>Wybierz</option>
+                <option value=school>Szkoła</option>
+                <option value=workshop>Warsztat</option>
+            </select>
+            <span class="input-group-addon">Rok</span>
+            <select name="year_select" class="selectpicker form-control">
+                <option value="" selected disabled hidden>Wybierz</option>
+                <option value=2015>2015</option>
+                <option value=2016>2016</option>
+                <option value=2017>2017</option>
+                <option value=2018>2018</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-default">Odśwież</button>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block content %}
+<h1>Zużycie energii: {{ year }} rok {{ building }}</h1>
+{{ the_div|safe }}
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.js"></script>
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.5.min.js"></script>
+{{ the_script|safe }}
+{% endblock %}
