@@ -1,24 +1,11 @@
 from database import db
 
 import pandas
-import os
 
 from flask import Flask
 from tables import SchoolEnergy, WorkshopEnergy
 
 import tabs
-
-
-def create_app():
-    app = Flask(__name__)
-    app.config['DEBUG'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///historical_data.db"
-    db_name = 'historical_data.db'
-    if os.path.isfile(db_name):
-        os.remove(db_name)
-    db.init_app(app)
-    app.register_blueprint(tabs.bp)
-    return app
 
 
 def setup_database(app):
@@ -37,8 +24,21 @@ def setup_database(app):
                 db.session.commit()
 
 
+app = Flask(__name__)
+
+app.config['DEBUG'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///historical_data.db"
+db_name = 'historical_data.db'
+
+db.init_app(app)
+
+app.register_blueprint(tabs.bp)
+
+
 if __name__ == "__main__":
-    app = create_app()
-    if not os.path.isfile('historical_data.db'):
-        setup_database(app)
+
     app.run(debug=True)
+    # if os.path.isfile(db_name):
+    #     os.remove(db_name)
+    # if not os.path.isfile('historical_data.db'):
+    #     setup_database(app)

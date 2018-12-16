@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-main">
+                <form class="form" method="POST">
+                    <label for="date">Data:</label>
+                    <input type="date" id="date" name="date"
+                           value="2018-07-22"
+                           min="2018-01-01" max="2018-12-31">
+                    <label for="quantity">Ilość energii:</label>
+                    <input type="number" step="0.01" id="quantity" name="quantity">
+                    <label for="consumption_price">Cena za zużycie:</label>
+                    <input type="number" step="0.01" id="consumption_price" name="consumption_price">
+                    <label for="transmission_price">Cena za przesył:</label>
+                    <input type="number" step="0.01" id="transmission_price" name="transmission_price">
+
+                    <button type="submit" class="btn btn-default">Dodaj</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+
+
+</style>
+<table class="tg">
+    <caption>Ostatnie rachunki:</caption>
+    <tr>
+        <th class="tg-0lax">Rok</th>
+        <th class="tg-0lax">Miesiąc</th>
+        <th class="tg-0lax">Zużycie energii [kWh]<br></th>
+        <th class="tg-0lax">Cena za zużycie [zł]</th>
+        <th class="tg-0lax">Cena za przesył [zł]</th>
+    </tr>
+    {% for row in rows %}
+
+    <tr>
+        <td>{{ row.year }}</a></td>
+        <td>{{ row.month }}</td>
+        <td>{{ row.quantity }}</a></td>
+        <td>{{ row.consumption_price }}</td>
+        <td>{{ row.transmission_price }}</a></td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

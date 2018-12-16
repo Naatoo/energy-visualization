@@ -6,9 +6,32 @@ from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
 from flask import render_template, request
 from tables import SchoolEnergy, WorkshopEnergy
+from tools.global_paths import MONTHS_NAMES_FILE
 import json
+from database import db
 
 bp = Blueprint('energy', __name__, url_prefix='/energy')
+
+
+@bp.route('/add', methods=['GET', 'POST'])
+def add():
+    rows = SchoolEnergy.query.order_by(SchoolEnergy.year.desc(), SchoolEnergy.month.desc()).limit(10).all()
+    with open(MONTHS_NAMES_FILE) as f:
+        months_names_mapping = json.loads(f.read())
+    for row in rows:
+        row.month = months_names_mapping[str(row.month)]
+    if request.method == 'POST':
+        date = request.form.get('date')
+        year, month = date.split('-')[:2]
+        quantity = request.form.get('quantity')
+        consumption_price = request.form.get('consumption_price')
+        transmission_price = request.form.get('transmission_price')
+
+        db.session.add(SchoolEnergy(year=year, month=month, quantity=quantity,
+                                    consumption_price=consumption_price, transmission_price=transmission_price))
+        db.session.commit()
+
+    return render_template("add.html", rows=rows)
 
 
 @bp.route('/gas')
@@ -16,7 +39,7 @@ def gas():
     pass
 
 
-@bp.route('/energy', methods=['GET', 'POST'])
+@bp.route('/show', methods=['GET', 'POST'])
 def energy():
     building_name = request.form.get('comp_select')
     year = request.form.get('year_select') if request.form.get('year_select') is not None else 2017
@@ -28,13 +51,14 @@ def energy():
         building_name = 'school'
     script, div = components(plot)
     return render_template("energy.html", year=year,
-                               the_div=div, the_script=script, building='szkoła' if building_name =='school' else 'warsztat')
+                           the_div=div, the_script=script,
+                           building='szkoła' if building_name == 'school' else 'warsztat')
 
 
 def get_data_to_chart(building_name: str, year: int):
     names = {'school': SchoolEnergy, 'workshop': WorkshopEnergy}
     building = names[building_name]
-    with open('mapping/months_names.json') as f:
+    with open(MONTHS_NAMES_FILE) as f:
         months_names_mapping = json.loads(f.read())
 
     month, quantity, price = [], [], []
@@ -42,7 +66,8 @@ def get_data_to_chart(building_name: str, year: int):
         month.append(months_names_mapping[str(row.month)])
         quantity.append(row.quantity)
         price.append((row.consumption_price if row.consumption_price is not None else 0 +
-                        (row.transmission_price if row.transmission_price is not None else 0)))
+                                                                                      (
+                                                                                          row.transmission_price if row.transmission_price is not None else 0)))
     data = {"month": month, "quantity": quantity, "price": price}
     hover = create_hover_tool()
     plot = create_bar_chart(data, "Zużycie energii", "month",
