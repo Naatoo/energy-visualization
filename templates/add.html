@@ -8,8 +8,6 @@
                 <form class="form" method="POST">
                     <label for="date">Data:</label>
                     <input type="date" id="date" name="date"
-                           value="2018-07-22"
-                           min="2018-01-01" max="2018-12-31">
                     <label for="quantity">Ilość energii:</label>
                     <input type="number" step="0.01" id="quantity" name="quantity">
                     <label for="consumption_price">Cena za zużycie:</label>
@@ -48,11 +46,11 @@
     {% for row in rows %}
 
     <tr>
-        <td>{{ row.year }}</a></td>
-        <td>{{ row.month }}</td>
-        <td>{{ row.quantity }}</a></td>
-        <td>{{ row.consumption_price }}</td>
-        <td>{{ row.transmission_price }}</a></td>
+        <td>{{ row[0] }}</a></td>
+        <td>{{ row[1] }}</td>
+        <td>{{ row[2] }}</a></td>
+        <td>{{ row[3] }}</td>
+        <td>{{ row[4] }}</a></td>
     </tr>
     {% endfor %}
 

@@ -2,7 +2,7 @@ from database import db
 
 import pandas
 
-from flask import Flask
+from flask import Flask, redirect, url_for
 from tables import SchoolEnergy, WorkshopEnergy
 
 import tabs
@@ -33,6 +33,11 @@ db_name = 'historical_data.db'
 db.init_app(app)
 
 app.register_blueprint(tabs.bp)
+
+
+@app.route('')
+def index():
+    return redirect(url_for('energy.energy'))
 
 
 if __name__ == "__main__":

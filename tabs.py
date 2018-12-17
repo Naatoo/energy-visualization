@@ -4,7 +4,7 @@ from bokeh.models.glyphs import VBar
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
-from flask import render_template, request
+from flask import render_template, request, redirect, url_for
 from tables import SchoolEnergy, WorkshopEnergy
 from tools.global_paths import MONTHS_NAMES_FILE
 import json
@@ -18,8 +18,8 @@ def add():
     rows = SchoolEnergy.query.order_by(SchoolEnergy.year.desc(), SchoolEnergy.month.desc()).limit(10).all()
     with open(MONTHS_NAMES_FILE) as f:
         months_names_mapping = json.loads(f.read())
-    for row in rows:
-        row.month = months_names_mapping[str(row.month)]
+    data = [[row.year, months_names_mapping[str(row.month)],
+             row.quantity, row.consumption_price, row.transmission_price] for row in rows]
     if request.method == 'POST':
         date = request.form.get('date')
         year, month = date.split('-')[:2]
@@ -30,13 +30,14 @@ def add():
         db.session.add(SchoolEnergy(year=year, month=month, quantity=quantity,
                                     consumption_price=consumption_price, transmission_price=transmission_price))
         db.session.commit()
+        return redirect(url_for('energy.add'))
 
-    return render_template("add.html", rows=rows)
+    return render_template("add.html", rows=data)
 
 
 @bp.route('/gas')
 def gas():
-    pass
+    return redirect(url_for('energy.energy'))
 
 
 @bp.route('/show', methods=['GET', 'POST'])
