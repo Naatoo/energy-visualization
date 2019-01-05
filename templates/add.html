@@ -7,13 +7,13 @@
             <div class="form-main">
                 <form class="form" method="POST">
                     <label for="date">Data:</label>
-                    <input type="date" id="date" name="date"
+                    <input type="date" id="date" name="date" min="2015-01-01" required>
                     <label for="quantity">Ilość energii:</label>
-                    <input type="number" step="0.01" id="quantity" name="quantity">
+                    <input type="number" step="0.01" id="quantity" name="quantity" required>
                     <label for="consumption_price">Cena za zużycie:</label>
-                    <input type="number" step="0.01" id="consumption_price" name="consumption_price">
+                    <input type="number" step="0.01" id="consumption_price" name="consumption_price" required>
                     <label for="transmission_price">Cena za przesył:</label>
-                    <input type="number" step="0.01" id="transmission_price" name="transmission_price">
+                    <input type="number" step="0.01" id="transmission_price" name="transmission_price" required>
 
                     <button type="submit" class="btn btn-default">Dodaj</button>
                 </form>
@@ -31,8 +31,6 @@
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 .tg .tg-0lax{text-align:left;vertical-align:top}
-
-
 </style>
 <table class="tg">
     <caption>Ostatnie rachunki:</caption>
