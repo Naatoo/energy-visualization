@@ -1,7 +1,16 @@
 {% extends 'base.html' %}
 
 {% block header %}
+
 <div class="container">
+    <label>Wybierz medium:</label>
+    <form method="POST">
+        <p>
+            <input type="radio" name="options" id="energy" value="energy"> Energia Elektryczna </input><br>
+            <input type="radio" name="options" id="gas" value="gas"> Gaz </input><br>
+        </p>
+        <p><input name="energy_type" type=submit value=Wybierz></p>
+    </form>
     <div class="row">
         <div class="col-md-4">
             <div class="form-main">
@@ -14,8 +23,13 @@
                     <input type="number" step="0.01" id="consumption_price" name="consumption_price" required>
                     <label for="transmission_price">Cena za przesył:</label>
                     <input type="number" step="0.01" id="transmission_price" name="transmission_price" required>
-
-                    <button type="submit" class="btn btn-default">Dodaj</button>
+                    <label for="building_select">Budynek</label>
+                    <select name="building_select" id="building_select" class="selectpicker form-control" required>
+                        <option value="" selected disabled hidden>Wybierz</option>
+                        <option value=school>Szkoła</option>
+                        <option value=workshop>Warsztat</option>
+                    </select>
+                    <button name="data_input" type="submit" class="btn btn-default">Dodaj</button>
                 </form>
             </div>
         </div>
@@ -31,12 +45,15 @@
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 .tg .tg-0lax{text-align:left;vertical-align:top}
+
+
 </style>
 <table class="tg">
     <caption>Ostatnie rachunki:</caption>
     <tr>
         <th class="tg-0lax">Rok</th>
         <th class="tg-0lax">Miesiąc</th>
+        <th class="tg-0lax">Budynek</th>
         <th class="tg-0lax">Zużycie energii [kWh]<br></th>
         <th class="tg-0lax">Cena za zużycie [zł]</th>
         <th class="tg-0lax">Cena za przesył [zł]</th>
@@ -49,6 +66,7 @@
         <td>{{ row[2] }}</a></td>
         <td>{{ row[3] }}</td>
         <td>{{ row[4] }}</a></td>
+        <td>{{ row[5] }}</td>
     </tr>
     {% endfor %}
 
