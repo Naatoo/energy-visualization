@@ -6,84 +6,16 @@ from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
 from flask import render_template, request, redirect, url_for
 from tables import Energy, Gas
-from tools.global_paths import MONTHS_NAMES_FILE, BUILDINGS_NAMES_POLISH_FILE, BUILDINGS_CODE_FILE
+from tools.global_paths import MONTHS_NAMES_FILE, BUILDINGS_CODE_FILE
 import json
 from database import db
 
-bp = Blueprint('energy', __name__, url_prefix='')
-
-
-@bp.route('/add/energy', methods=['GET', 'POST'])
-def add_energy():
-    type_choice = get_energy_type(current_page="energy")
-    if request.method == 'POST':
-        if "data_input" in request.form:
-            date = request.form.get('date')
-            year, month = date.split('-')[:2]
-            quantity = request.form.get('quantity')
-            consumption_price = request.form.get('consumption_price')
-            transmission_price = request.form.get('transmission_price')
-
-            db.session.add(Energy(year=year, month=month, quantity=quantity,
-                                  consumption_price=consumption_price, transmission_price=transmission_price,
-                                  building='SCH'))
-
-            db.session.commit()
-    if type_choice == 'energy':
-        return render_template("add_energy.html", rows=get_data(type_choice="energy"))
-    else:
-        return redirect(url_for("energy.add_gas"))
-
-
-@bp.route('/add/gas', methods=['GET', 'POST'])
-def add_gas():
-    type_choice = get_energy_type(current_page="gas")
-    if request.method == 'POST':
-
-        if "data_input" in request.form:
-            date = request.form.get('date')
-            year, month = date.split('-')[:2]
-            quantity = request.form.get('quantity')
-            price = request.form.get('price')
-
-            db.session.add(Gas(year=year, month=month, quantity=quantity,
-                               price=price, building='WOR'))
-            db.session.commit()
-
-    if type_choice == 'gas':
-        return render_template("add_gas.html", rows=get_data(type_choice="gas"))
-    else:
-        return redirect(url_for("energy.add_energy"))
-
-
-def get_energy_type(current_page):
-    type_choice = current_page
-    if request.method == "POST" and "energy_type" in request.form:
-        type_choice = request.form["options"]
-    return type_choice
-
-
-def get_data(type_choice):
-    with open(MONTHS_NAMES_FILE) as f:
-        months_names_mapping = json.loads(f.read())
-
-    with open(BUILDINGS_NAMES_POLISH_FILE) as f:
-        buildings_names = json.loads(f.read())
-
-    if type_choice == 'energy':
-        rows = Energy.query.order_by(Energy.year.desc(), Energy.month.desc()).limit(10).all()
-        data = [[row.year, months_names_mapping[str(row.month)], buildings_names[row.building],
-                 row.quantity, row.consumption_price, row.transmission_price] for row in rows]
-    elif type_choice == 'gas':
-        rows = Gas.query.order_by(Gas.year.desc(), Gas.month.desc()).limit(10).all()
-        data = [[row.year, months_names_mapping[str(row.month)], buildings_names[row.building],
-                 row.quantity, row.price] for row in rows]
-    return data
+bp = Blueprint('analyse', __name__, url_prefix='')
 
 
 @bp.route('/gas')
 def gas():
-    return redirect(url_for('energy.energy'))
+    return redirect(url_for('analyse.energy'))
 
 
 @bp.route('/show', methods=['GET', 'POST'])
@@ -92,9 +24,9 @@ def energy():
     year = request.form.get('year_select') if request.form.get('year_select') is not None else 2017
 
     if building_name is not None and year is not None:
-        plot = get_data_to_chart(building_name, year)
+        plot = get_data(building_name)
     else:
-        plot = get_data_to_chart('school', 2017)
+        plot = get_data('school')
         building_name = 'school'
     script, div = components(plot)
     return render_template("energy.html", year=year,
@@ -115,12 +47,12 @@ def get_data_to_chart(building_name: str, year: int):
         month.append(months_names_mapping[str(row.month)])
         quantity.append(row.quantity)
         price.append((row.consumption_price if row.consumption_price is not None else 0 +
-                                                                                      (
-                                                                                          row.transmission_price if row.transmission_price is not None else 0)))
+            (row.transmission_price if row.transmission_price is not None else 0)))
     data = {"month": month, "quantity": quantity, "price": price}
     hover = create_hover_tool()
-    plot = create_bar_chart(data, "Zużycie energii", "month",
-                            "quantity", hover)
+    # plot = create_bar_chart(data, "Zużycie energii", "month",
+    #                         "quantity", hover)
+    plot = squares()
     return plot
 
 
@@ -177,3 +109,85 @@ def create_bar_chart(data, title, x_name, y_name, hover_tool=None,
     plot.xaxis.axis_label = "Miesiąc"
     plot.xaxis.major_label_orientation = 1
     return plot
+
+
+def get_data(building_name: str):
+    names = {'school': Energy, 'workshop': Energy}
+    building = names[building_name]
+    with open(MONTHS_NAMES_FILE) as f:
+        months_names_mapping = json.loads(f.read())
+
+    year, month, quantity, price = [], [], [], []
+    with open(BUILDINGS_CODE_FILE) as f:
+        buildings_codes = json.loads(f.read())
+
+    quantity = {str(month): [] for month in range(1, 13)}
+    quantity['Year'] = ['2015', '2016', '2017']
+    quantity['Annual'] = [1,1,1]
+
+    for row in building.query.filter_by(building=buildings_codes[building_name]).order_by("month").all():
+        quantity[str(row.month)].append(row.quantity)
+    print(quantity)
+    hover = create_hover_tool()
+    # plot = create_bar_chart(data, "Zużycie energii", "month",
+    #                         "quantity", hover)
+    plot = squares(quantity)
+    return plot
+
+
+def squares(quantity):
+
+    from math import pi
+    import pandas as pd
+
+    from bokeh.io import show
+    from bokeh.models import LinearColorMapper, BasicTicker, PrintfTickFormatter, ColorBar
+    from bokeh.plotting import figure
+
+
+    # print(data)
+    data = pd.DataFrame(quantity)
+    # print(data)
+    data['Year'] = data['Year'].astype(str)
+    data = data.set_index('Year')
+    data.drop('Annual', axis=1, inplace=True)
+    data.columns.name = 'Month'
+
+    years = list(data.index)
+    months = list(data.columns)
+
+    # reshape to 1D array or rates with a month and year for each row.
+    df = pd.DataFrame(data.stack(), columns=['rate']).reset_index()
+
+    # this is the colormap from the original NYTimes plot
+    colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+    mapper = LinearColorMapper(palette=colors, low=df.rate.min(), high=df.rate.max())
+
+    TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
+
+    p = figure(title="US Unemployment ({0} - {1})".format(years[0], years[-1]),
+               y_range=years, x_range=list(reversed(months)),
+               x_axis_location="above", plot_width=900, plot_height=400,
+               tools=TOOLS, toolbar_location='below')
+               # ('rate', '@rate%')])
+    # tooltips = [('date', '@Month @Year'),
+    p.grid.grid_line_color = None
+    p.axis.axis_line_color = None
+    p.axis.major_tick_line_color = None
+    p.axis.major_label_text_font_size = "5pt"
+    p.axis.major_label_standoff = 0
+    p.xaxis.major_label_orientation = pi / 3
+
+    p.rect(y="Year", x="Month", width=1, height=1,
+           source=df,
+           fill_color={'field': 'rate', 'transform': mapper},
+           line_color=None)
+
+    color_bar = ColorBar(color_mapper=mapper, major_label_text_font_size="5pt",
+                         ticker=BasicTicker(desired_num_ticks=len(colors)),
+                         formatter=PrintfTickFormatter(format="%d%%"),
+                         label_standoff=6, border_line_color=None, location=(0, 0))
+    p.add_layout(color_bar, 'right')
+
+    return p
+
