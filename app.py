@@ -5,7 +5,8 @@ import pandas
 from flask import Flask, redirect, url_for
 from tables import Energy, Gas
 
-import tabs
+import charts
+import data
 
 
 def setup_database(app):
@@ -47,12 +48,13 @@ db_name = 'main_data.db'
 
 db.init_app(app)
 
-app.register_blueprint(tabs.bp)
+app.register_blueprint(charts.bp)
+app.register_blueprint(data.bp)
 
 
 @app.route('/')
 def index():
-    return redirect(url_for('energy.energy'))
+    return redirect(url_for('analyse.energy'))
 
 
 if __name__ == "__main__":
