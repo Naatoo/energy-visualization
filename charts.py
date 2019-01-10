@@ -5,10 +5,9 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
 from flask import render_template, request, redirect, url_for
-from tables import Energy, Gas
-from tools.global_paths import MONTHS_NAMES_FILE, BUILDINGS_CODE_FILE
+from app.models import Energy
+from app.tools.global_paths import MONTHS_NAMES_FILE, BUILDINGS_CODE_FILE
 import json
-from database import db
 
 bp = Blueprint('analyse', __name__, url_prefix='')
 
