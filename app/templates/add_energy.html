@@ -1,43 +1,16 @@
-{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
 
 {% block header %}
-
-<div class="container">
-    <label>Wybierz medium:</label>
-    <form method="POST">
-        <p>
-            <input type="radio" name="options" id="energy" value="energy"> Energia Elektryczna </input><br>
-            <input type="radio" name="options" id="gas" value="gas"> Gaz </input><br>
-        </p>
-        <p><input name="energy_type" type=submit value=Wybierz></p>
-    </form>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-main">
-                <form class="form" method="POST">
-                    <label for="date">Data:</label>
-                    <input type="date" id="date" name="date" min="2015-01-01" required>
-                    <label for="quantity">Ilość energii:</label>
-                    <input type="number" step="0.01" id="quantity" name="quantity" required>
-                    <label for="consumption_price">Cena za zużycie:</label>
-                    <input type="number" step="0.01" id="consumption_price" name="consumption_price" required>
-                    <label for="transmission_price">Cena za przesył:</label>
-                    <input type="number" step="0.01" id="transmission_price" name="transmission_price" required>
-                    <label for="building_select">Budynek</label>
-                    <select name="building_select" id="building_select" class="selectpicker form-control" required>
-                        <option value="" selected disabled hidden>Wybierz</option>
-                        <option value=school>Szkoła</option>
-                        <option value=workshop>Warsztat</option>
-                    </select>
-                    <button name="data_input" type="submit" class="btn btn-default">Dodaj</button>
-                </form>
-            </div>
-        </div>
+<div class="content-section">
+    <div class="center">
+        <h1>Add energy bill</h1>
+        <br/>
+        {{ wtf.quick_form(form) }}
     </div>
 </div>
-
-
 {% endblock %}
+
 
 {% block content %}
 <style type="text/css">
@@ -45,6 +18,7 @@
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 .tg .tg-0lax{text-align:left;vertical-align:top}
+
 
 
 </style>
