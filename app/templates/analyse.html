@@ -1,0 +1,21 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends 'base.html' %}
+
+{% block header %}
+<div class="content-section">
+    <div class="center">
+        <h1>Add gas bill</h1>
+        <br/>
+        {{ wtf.quick_form(form) }}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<h1>Zużycie energii: {{ year }} rok {{ building }}</h1>
+{{ the_div|safe }}
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js"></script>
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js"></script>
+{{ the_script|safe }}
+{% endblock %}

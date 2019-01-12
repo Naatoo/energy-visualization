@@ -3,7 +3,7 @@ import pandas
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
-import charts
+from .analyse import analyse as analyse_blueprint
 from .data_crud import data as data_blueprint
 from app.models import Gas, Energy
 from database import  db
@@ -22,7 +22,7 @@ def create_app():
 
     db.init_app(app)
 
-    app.register_blueprint(charts.bp)
+    app.register_blueprint(analyse_blueprint)
     app.register_blueprint(data_blueprint)
 
     return app
@@ -57,4 +57,5 @@ def insert_initial_gas_data():
             db.session.add(Gas(year=year, month=month, quantity=quantity, price=price,
                                building='SCH' if name == 'school' else 'WOR'))
             db.session.commit()
+
 
