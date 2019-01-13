@@ -1,0 +1,46 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+
+{% block header %}
+<div class="content-section">
+    <div class="center">
+        <h1>Add gas bill</h1>
+        <br/>
+        {{ wtf.quick_form(form) }}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+
+
+
+</style>
+<table class="tg">
+    <caption>Ostatnie rachunki:</caption>
+    <tr>
+        <th class="tg-0lax">Rok</th>
+        <th class="tg-0lax">Miesiąc</th>
+        <th class="tg-0lax">Budynek</th>
+        <th class="tg-0lax">Zużycie gazu [m3]<br></th>
+        <th class="tg-0lax">Cena gazu [zł]</th>
+    </tr>
+    {% for row in rows %}
+
+    <tr>
+        <td>{{ row[0] }}</a></td>
+        <td>{{ row[1] }}</td>
+        <td>{{ row[2] }}</a></td>
+        <td>{{ row[3] }}</td>
+        <td>{{ row[4] }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

@@ -1,12 +1,31 @@
-from database import db
-
+import os
 import pandas
+from flask import Flask
+from flask_bootstrap import Bootstrap
 
-from flask import Flask, redirect, url_for
-from tables import Energy, Gas
+from .analyse import analyse as analyse_blueprint
+from .data_crud import data as data_blueprint
+from app.models import Gas, Energy
+from database import  db
 
-import charts
-import data
+
+def create_app():
+
+    app = Flask(__name__)
+
+    app.config['DEBUG'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///../main_data.db"
+    SECRET_KEY = os.urandom(32)
+    app.config['SECRET_KEY'] = SECRET_KEY
+    Bootstrap(app)
+    db_name = 'main_data.db'
+
+    db.init_app(app)
+
+    app.register_blueprint(analyse_blueprint)
+    app.register_blueprint(data_blueprint)
+
+    return app
 
 
 def setup_database(app):
@@ -18,7 +37,7 @@ def setup_database(app):
 
 def insert_initial_energy_data():
     for name in 'school', 'workshop':
-        data = pandas.read_excel('data/{}_energy.xlsx'.format(name)).to_dict('list')
+        data = pandas.read_excel('app/initial_data/{}_energy.xlsx'.format(name)).to_dict('list')
 
         for year, month, quantity, consumption_price, transmission_price in zip(data['year'], data['month'],
                                                                                 data['quantity'],
@@ -32,7 +51,7 @@ def insert_initial_energy_data():
 
 def insert_initial_gas_data():
     for name in 'school', 'workshop':
-        data = pandas.read_excel('data/{}_gas.xlsx'.format(name)).to_dict('list')
+        data = pandas.read_excel('app/initial_data/{}_gas.xlsx'.format(name)).to_dict('list')
 
         for year, month, quantity, price in zip(data['year'], data['month'], data['quantity'], data['price']):
             db.session.add(Gas(year=year, month=month, quantity=quantity, price=price,
@@ -40,25 +59,3 @@ def insert_initial_gas_data():
             db.session.commit()
 
 
-app = Flask(__name__)
-
-app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///main_data.db"
-db_name = 'main_data.db'
-
-db.init_app(app)
-
-app.register_blueprint(charts.bp)
-app.register_blueprint(data.bp)
-
-
-@app.route('/')
-def index():
-    return redirect(url_for('analyse.energy'))
-
-
-if __name__ == "__main__":
-    import os
-    if not os.path.isfile('main_data.db'):
-        setup_database(app)
-    app.run(debug=True)
