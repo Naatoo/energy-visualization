@@ -16,12 +16,14 @@ def show():
     building = 'SCH'
     year = 2017
     energy_type = 'energy'
+    chart_type = 'Column'
     if form.validate_on_submit():
         year = form.year.data
         building = form.building.data
         energy_type = form.energy_type.data
+        chart_type = form.chart_type.data
 
-    chart = ChartTool(building=building, year=year, energy_type=energy_type)
+    chart = ChartTool(building=building, year=year, energy_type=energy_type, chart_type=chart_type)
     script, div = chart.generate_components()
 
     return render_template("analyse.html", year=year,
