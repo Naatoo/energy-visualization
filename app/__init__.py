@@ -6,22 +6,17 @@ from flask_bootstrap import Bootstrap
 from .analyse import analyse as analyse_blueprint
 from .data_crud import data as data_blueprint
 from app.models import Gas, Energy
-from database import  db
+from database import db
 
 
 def create_app():
-
     app = Flask(__name__)
-
     app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///../main_data.db"
     SECRET_KEY = os.urandom(32)
     app.config['SECRET_KEY'] = SECRET_KEY
     Bootstrap(app)
-    db_name = 'main_data.db'
-
     db.init_app(app)
-
     app.register_blueprint(analyse_blueprint)
     app.register_blueprint(data_blueprint)
 
@@ -57,5 +52,3 @@ def insert_initial_gas_data():
             db.session.add(Gas(year=year, month=month, quantity=quantity, price=price,
                                building='SCH' if name == 'school' else 'WOR'))
             db.session.commit()
-
-

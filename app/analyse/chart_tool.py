@@ -1,13 +1,11 @@
 import json
-from collections import defaultdict
-from bokeh.embed import components
+from collections import defaultdict, OrderedDict
 from statistics import mean
 
 from app.analyse.plots_generation.surface_chart import squares
 from app.models import Energy, Gas
-from app.tools.global_paths import MONTHS_NAMES_FILE, BUILDINGS_CODE_FILE
+from app.tools.global_paths import MONTHS_NAMES_FILE
 from app.analyse.plots_generation.column_line_chart import generate_stacked_chart
-from collections import OrderedDict
 
 
 class ChartTool:
@@ -36,7 +34,7 @@ class ChartTool:
                 else:
                     data = self.get_all_energy_types_all_building_types_data()
             plot = generate_stacked_chart(data, "Zużycie energii i gazu",
-                                                chart_type=self.chart_type)
+                                          chart_type=self.chart_type)
         return plot
 
     def get_data_surface(self):
@@ -49,7 +47,8 @@ class ChartTool:
             for building in buildings:
                 for row in model.query.filter_by(building=building).all():
                     if model == Energy:
-                        price = row.consumption_price if row.consumption_price is not None else 0 + row.transmission_price if row.transmission_price is not None else 0
+                        price = row.consumption_price if row.consumption_price is not None else 0\
+                            + row.transmission_price if row.transmission_price is not None else 0
                     else:
                         price = row.price
                     if len(data[self.months_names_mapping[str(row.month)]]) != 4:
@@ -63,49 +62,7 @@ class ChartTool:
             data[k] = [r for r in reversed(data[k])]
         return data
 
-    def get_single_data(self):
-        filters = {'year': self.interval, 'building': self.building}
-        months, data = self.query_data(filters=filters, energy_type=self.energy_type)
-        return {
-            'months': months,
-            'data': data,
-        }
-
-    def get_all_building_types_data(self):
-        school_data_months, school_data = self.query_data(filters={'year': self.interval, 'building': 'SCH'},
-                                                          energy_type=self.energy_type)
-        workshop_data_months, workshop_data = self.query_data(filters={'year': self.interval, 'building': 'WOR'},
-                                                              energy_type=self.energy_type)
-        self.assert_intervals_correct(school_data_months, workshop_data_months)
-        return {
-            'months': school_data_months,
-            'school_data': school_data,
-            'workshop_data': workshop_data
-        }
-
-    def get_all_energy_types_data(self, building: str=None):
-        filters = {'year': self.interval, 'building': self.building if building is None else building}
-        energy_data_months, energy_data = self.query_data(filters=filters, energy_type='energy')
-        gas_data_months, gas_data = self.query_data(filters=filters, energy_type='gas')
-        self.assert_intervals_correct(energy_data_months, gas_data_months)
-        return {
-            'months': energy_data_months,
-            '{}energy_data'.format("" if building is None else building + "_"): energy_data,
-            '{}gas_data'.format("" if building is None else building + "_"): gas_data
-        }
-
-    def get_all_energy_types_all_building_types_data(self):
-        all_school_data = self.get_all_energy_types_data(building='SCH')
-        all_workshop_data = self.get_all_energy_types_data(building='WOR')
-        all_energy_types_all_building_types_data = {**all_school_data, **all_workshop_data}
-        print(all_energy_types_all_building_types_data)
-        return all_energy_types_all_building_types_data
-
-    @staticmethod
-    def assert_intervals_correct(first_interval: list, second_interval: list) -> None:
-        assert first_interval == second_interval, '{} is not equal to {}'.format(first_interval, second_interval)
-
-    def query_data(self, filters: dict, energy_type: str=None):
+    def get_data_column_line(self, filters: dict, energy_type: str = None):
         model = self.models_mapping(energy_type)
         months, prices = [], []
         if self.interval in ["All", "Avarage"] and 'year' in filters.keys():
@@ -134,6 +91,48 @@ class ChartTool:
                 prices.append(price)
         return months, prices
 
+    def get_single_data(self):
+        filters = {'year': self.interval, 'building': self.building}
+        months, data = self.get_data_column_line(filters=filters, energy_type=self.energy_type)
+        return {
+            'months': months,
+            'data': data,
+        }
+
+    def get_all_building_types_data(self):
+        school_data_months, school_data = self.get_data_column_line(filters={'year': self.interval, 'building': 'SCH'},
+                                                                    energy_type=self.energy_type)
+        workshop_data_months, workshop_data = self.get_data_column_line(
+            filters={'year': self.interval, 'building': 'WOR'},
+            energy_type=self.energy_type)
+        self.assert_intervals_correct(school_data_months, workshop_data_months)
+        return {
+            'months': school_data_months,
+            'school_data': school_data,
+            'workshop_data': workshop_data
+        }
+
+    def get_all_energy_types_data(self, building: str = None):
+        filters = {'year': self.interval, 'building': self.building if building is None else building}
+        energy_data_months, energy_data = self.get_data_column_line(filters=filters, energy_type='energy')
+        gas_data_months, gas_data = self.get_data_column_line(filters=filters, energy_type='gas')
+        self.assert_intervals_correct(energy_data_months, gas_data_months)
+        return {
+            'months': energy_data_months,
+            '{}energy_data'.format("" if building is None else building + "_"): energy_data,
+            '{}gas_data'.format("" if building is None else building + "_"): gas_data
+        }
+
+    def get_all_energy_types_all_building_types_data(self):
+        all_school_data = self.get_all_energy_types_data(building='SCH')
+        all_workshop_data = self.get_all_energy_types_data(building='WOR')
+        all_energy_types_all_building_types_data = {**all_school_data, **all_workshop_data}
+        return all_energy_types_all_building_types_data
+
+    @staticmethod
+    def assert_intervals_correct(first_interval: list, second_interval: list) -> None:
+        assert first_interval == second_interval, '{} is not equal to {}'.format(first_interval, second_interval)
+
     @property
     def months_names_mapping(self):
         with open(MONTHS_NAMES_FILE) as f:
@@ -142,11 +141,3 @@ class ChartTool:
     def models_mapping(self, energy_type=None):
         mapping = {'energy': Energy, 'gas': Gas}
         return mapping[self.energy_type] if energy_type is None else mapping[energy_type]
-
-    @property
-    def script(self):
-        return components(self.plot)[0]
-
-    @property
-    def div(self):
-        return components(self.plot)[1]
