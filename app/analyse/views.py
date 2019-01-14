@@ -3,6 +3,7 @@ from flask import request, render_template
 from app.analyse import analyse
 from app.analyse.forms import ChartForm
 from app.analyse.chart_tool import ChartTool
+from bokeh.embed import components
 
 
 @analyse.route('/analyse', methods=['GET', 'POST'])
@@ -23,10 +24,9 @@ def show():
         energy_type = form.energy_type.data
         chart_type = form.chart_type.data
 
-    chart = ChartTool(building=building, year=year, energy_type=energy_type, chart_type=chart_type)
-    script, div = chart.generate_components()
+    chart = ChartTool(building=building, interval=year, energy_type=energy_type, chart_type=chart_type)
+    script, div = components(chart.plot)
 
-    return render_template("analyse.html", year=year,
+    return render_template("analyse.html",
                            the_div=div, the_script=script,
-                           building='szkoła' if building == 'SCH'
-                           else 'warsztat', form=form)
+                           form=form)
