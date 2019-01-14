@@ -19,31 +19,9 @@ class ChartTool:
         self.chart_type = chart_type
         self.plot = self.handle_input()
 
-    def get_data_surface(self):
-        model = self.models_mapping(self.energy_type)
-
-        prices = OrderedDict((self.months_names_mapping[str(month)], []) for month in reversed(range(1, 13)))
-        prices['Year'] = ['2015', '2016', '2017', '2018']
-
-        for row in model.query.filter_by(building=self.building).all():
-            prices[self.months_names_mapping[str(row.month)]].append(row.consumption_price if row.consumption_price is not None else 0 +
-                                                                                       (
-                                                                                           row.transmission_price if row.transmission_price is not None else 0)
-                      if energy_type == 'energy' else row.price)
-        for k, quan in prices.items():
-            if len(quan) != len(prices['Styczeń']):
-                quan.append(0)
-            prices[k] = [r for r in reversed(prices[k])]
-        return prices
-
     def handle_input(self):
         if self.chart_type == 'Surface':
-            if self.building == "All" and self.energy_type == "All":
-
-                data = self.get_data_surface()
-            else:
-                data = self.get_data_surface()
-
+            data = self.get_data_surface()
             plot = squares(data)
         else:
             if self.energy_type != "All":
@@ -61,16 +39,29 @@ class ChartTool:
                                                 chart_type=self.chart_type)
         return plot
 
+    def get_data_surface(self):
+        data = OrderedDict((self.months_names_mapping[str(month)], []) for month in reversed(range(1, 13)))
+        data['Year'] = ['2015', '2016', '2017', '2018']
+        energy_types = [self.models_mapping(self.energy_type)] if self.energy_type != "All" else [Energy, Gas]
+        buildings = [self.building] if self.building != "All" else ['SCH', 'WOR']
 
-
-    def get_single_data_surface(self):
-        pass
-    def get_all_building_types_data_surface(self):
-        pass
-    def get_all_energy_types_data_surface(self):
-        pass
-    def get_all_energy_types_all_building_types_data_surface(self):
-        pass
+        for model in energy_types:
+            for building in buildings:
+                for row in model.query.filter_by(building=building).all():
+                    if model == Energy:
+                        price = row.consumption_price if row.consumption_price is not None else 0 + row.transmission_price if row.transmission_price is not None else 0
+                    else:
+                        price = row.price
+                    if len(data[self.months_names_mapping[str(row.month)]]) != 4:
+                        data[self.months_names_mapping[str(row.month)]].append(price)
+                    else:
+                        data[self.months_names_mapping[str(row.month)]][data['Year'].index(str(row.year))] \
+                            += price
+        for k, quan in data.items():
+            if len(quan) != len(data['Styczeń']):
+                quan.append(0)
+            data[k] = [r for r in reversed(data[k])]
+        return data
 
     def get_single_data(self):
         filters = {'year': self.interval, 'building': self.building}
@@ -122,20 +113,25 @@ class ChartTool:
         if self.interval == 'Avarage':
             price_def = defaultdict(list)
             for row in model.query.filter_by(**filters).all():
+                if model == Energy:
+                    price = row.consumption_price if row.consumption_price is not None else 0 + row.transmission_price \
+                        if row.transmission_price is not None else 0
+                else:
+                    price = row.price
                 if self.months_names_mapping[str(row.month)] not in months:
                     months.append(self.months_names_mapping[str(row.month)])
-                price_def[self.months_names_mapping[str(row.month)]].append((row.consumption_price if row.consumption_price is not None else 0 +
-                        (row.transmission_price if row.transmission_price is not None else 0))
-                        if energy_type == 'energy' else row.price)
-
+                price_def[self.months_names_mapping[str(row.month)]].append(price)
             for month in months:
                 prices.append(round(mean(price_def[month]), 1))
         else:
             for row in model.query.filter_by(**filters).all():
+                if model == Energy:
+                    price = row.consumption_price if row.consumption_price is not None else 0 + row.transmission_price \
+                        if row.transmission_price is not None else 0
+                else:
+                    price = row.price
                 months.append("{} {}".format(self.months_names_mapping[str(row.month)], str(row.year)))
-                prices.append((row.consumption_price if row.consumption_price is not None else 0 +
-                      ( row.transmission_price if row.transmission_price is not None else 0))
-                      if energy_type == 'energy' else row.price)
+                prices.append(price)
         return months, prices
 
     @property

@@ -33,11 +33,10 @@ def squares(quantity):
     p.axis.major_label_standoff = 0
     p.xaxis.major_label_orientation = pi / 3
 
-    renderers = p.rect(y="Year", x="Month", width=1, height=1,
+    p.rect(y="Year", x="Month", width=1, height=1,
            source=df,
            fill_color={'field': 'rate', 'transform': mapper},
            line_color=None)
-
 
     color_bar = ColorBar(color_mapper=mapper, title='Koszt [zł]',
                          # major_label_text_font_size="5pt",
