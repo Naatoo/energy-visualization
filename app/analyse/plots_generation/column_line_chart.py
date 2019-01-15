@@ -36,7 +36,7 @@ def generate_stacked_chart(data: dict, text: dict, width=1200, height=800, chart
             hover = HoverTool(tooltips=[
                 ("{}: ".format(text["tooltip"]["energy_type"]["label"]), text["tooltip"]["energy_type"]["value"]),
                 ("{}: ".format(text["tooltip"]["building"]["label"]), text["tooltip"]["building"]["value"]),
-                ("Koszt: ", "@%s{0.00} kWh" % item),
+                ("Koszt: ", "@%s{0.00} zł" % item),
                 ("Miesiąc: ", "@months") ], renderers=[r])
             plot.add_tools(hover)
 
