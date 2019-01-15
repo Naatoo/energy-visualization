@@ -17,10 +17,8 @@ class ChartTool:
         self.energy_type = energy_type
         self.chart_type = chart_type
         self.tra = self.get_translations()
-
         self.plot = self.handle_input()
 
-        # TODO tooltips for columns
         # TODO data for 2018
 
     def handle_input(self):
@@ -170,19 +168,6 @@ class ChartTool:
                                                                 building_1=self.tra["names_title"]["SCH"],
                                                                 building_2=self.tra["names_title"]["WOR"],
                                                                 interval=self.interval),
-            "tooltip": {
-
-                "energy_type": {
-
-                    "label": '123',
-                    "value": '123'
-                },
-                "building":
-                    {
-                        "label": '123',
-                        "value": '123'
-                    }
-            },
             "legend": self.tra["legend"]["both_buildings"]
 
         }
@@ -204,20 +189,6 @@ class ChartTool:
                                                               energy_type_2=self.tra["names_title"]["gas"],
                                                               building=self.tra["names_title"][building],
                                                               interval=self.interval),
-            "tooltip": {
-
-                "energy_type": {
-
-                    "label": '123',
-                    "value": '123'
-                },
-                "building":
-                    {
-                        "label": '123',
-                        "value": '123'
-                    }
-
-            },
             "legend": self.tra["legend"]["both_mediums"]
         }
         return text, {
@@ -238,19 +209,6 @@ class ChartTool:
                 building_1=self.tra["names_title"]["SCH"],
                 building_2=self.tra["names_title"]["WOR"],
                 interval=self.interval),
-            "tooltip": {
-
-                "energy_type": {
-
-                    "label": '123',
-                    "value": '123'
-                },
-                "building":
-                    {
-                        "label": '123',
-                        "value": '123'
-                    }
-            },
             "legend": self.tra["legend"]["both_mediums_and_buildings"]
         }
         return text, all_energy_types_all_building_types_data

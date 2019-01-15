@@ -4,7 +4,6 @@ from bokeh.models import HoverTool
 from bokeh.models import ColumnDataSource, LinearAxis, Grid
 from bokeh.plotting import figure
 from bokeh.models import Legend, LegendItem
-from bokeh.core.properties import value
 
 from app.tools.global_paths import TRANSLATIONS_FILE
 
@@ -28,25 +27,25 @@ def generate_stacked_chart(data: dict, text: dict, width=1200, height=800, chart
     if chart_type == 'Column':
         source = ColumnDataSource(data)
         renderers = plot.vbar_stack(energy_types, x='months', width=0.8, color=colors, source=source,
-                                    # legend=[value(x) for x in energy_types] if len(energy_types) != 1 else None)
                                     legend=[item for item in text['legend']] if text.get('legend') else None)
 
         for r in renderers:
             item = r.name
-            hover = HoverTool(tooltips=[
-                ("{}: ".format(text["tooltip"]["energy_type"]["label"]), text["tooltip"]["energy_type"]["value"]),
-                ("{}: ".format(text["tooltip"]["building"]["label"]), text["tooltip"]["building"]["value"]),
+            tooltips = [
                 ("Koszt: ", "@%s{0.00} zł" % item),
-                ("Miesiąc: ", "@months") ], renderers=[r])
+                ("Miesiąc: ", "@months")]
+            if text.get("tooltip", None):
+                additional_tooltips = [
+                    ("{}: ".format(text["tooltip"]["energy_type"]["label"]), text["tooltip"]["energy_type"]["value"]),
+                    ("{}: ".format(text["tooltip"]["building"]["label"]), text["tooltip"]["building"]["value"])]
+                for t in additional_tooltips:
+                    tooltips.insert(0, t)
+            hover = HoverTool(tooltips=tooltips, renderers=[r])
             plot.add_tools(hover)
 
     elif chart_type == 'Line':
         r = plot.multi_line([[month for month in months] for item in energy_types],
                             [data[type_energy] for type_energy in energy_types], color=colors, line_width=4)
-        # r = plot.multi_line(xs='months', ys='school', source=source, line_color='color', line_width=4)
-
-        # legend = Legend(
-        #     items=[LegendItem(label=item, renderers=[r], index=index) for index, item in enumerate(energy_types)])
         if text.get('legend', None):
             legend = Legend(
                 items=[LegendItem(label=item, renderers=[r], index=index) for index, item in enumerate(text['legend'])])
