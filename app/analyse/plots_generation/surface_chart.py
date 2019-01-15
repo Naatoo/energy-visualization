@@ -5,8 +5,8 @@ from bokeh.models import LinearColorMapper, ColorBar, BasicTicker
 from bokeh.plotting import figure
 
 
-def squares(quantity):
-    data = pd.DataFrame(quantity)
+def generate_surface_chart(data: dict, title: str):
+    data = pd.DataFrame(data)
     data['Year'] = data['Year'].astype(str)
     data = data.set_index('Year')
     data.columns.name = 'Month'
@@ -21,7 +21,7 @@ def squares(quantity):
 
     TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
 
-    p = figure(title="US Unemployment ({0} - {1})".format(years[0], years[-1]),
+    p = figure(title=title,
                y_range=years, x_range=list(reversed(months)),
                x_axis_location="above", plot_width=900, plot_height=400,
                tools=TOOLS, toolbar_location='below', tooltips=[('Miesiąc', '@Month @Year'), ('Koszt', '@rate{0.00} zł')])

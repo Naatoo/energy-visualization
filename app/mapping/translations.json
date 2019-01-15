@@ -10,7 +10,8 @@
     "energy": "energii elektrycznej",
     "SCH": "szkole",
     "WOR": "warsztacie",
-    "All_years": "latach 2015-2018"
+    "All_years": "latach 2015-2018",
+    "avg": "Średni miesięczny "
   },
   "tooltip_labels":{
     "energy": "Rodzaj energii",

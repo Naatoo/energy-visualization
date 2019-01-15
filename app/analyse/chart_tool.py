@@ -2,7 +2,7 @@ import json
 from collections import defaultdict, OrderedDict
 from statistics import mean
 
-from app.analyse.plots_generation.surface_chart import squares
+from app.analyse.plots_generation.surface_chart import generate_surface_chart
 from app.models import Energy, Gas
 from app.tools.global_paths import MONTHS_NAMES_FILE
 from app.analyse.plots_generation.column_line_chart import generate_stacked_chart
@@ -20,13 +20,13 @@ class ChartTool:
 
         self.plot = self.handle_input()
 
-        #TODO text in surface
-        #TODO tooltips for columns
+        # TODO tooltips for columns
+        # TODO data for 2018
 
     def handle_input(self):
         if self.chart_type == 'Surface':
-            data = self.get_data_surface()
-            plot = squares(data)
+            title, data = self.get_data_surface()
+            plot = generate_surface_chart(data, title)
         else:
             if self.energy_type != "All":
                 if self.building != "All":
@@ -38,6 +38,11 @@ class ChartTool:
                     text, data = self.get_all_energy_types_data()
                 else:
                     text, data = self.get_all_energy_types_all_building_types_data()
+            if self.interval == 'Avarage':
+                initial_title = text['title']
+                final_title = self.tra['names_title']['avg'] + initial_title.replace("Avarage", self.tra["names_title"][
+                    "All_years"]).lower()
+                text['title'] = final_title
             plot = generate_stacked_chart(data, text,
                                           chart_type=self.chart_type)
         return plot
@@ -45,14 +50,44 @@ class ChartTool:
     def get_data_surface(self):
         data = OrderedDict((self.months_names_mapping[str(month)], []) for month in reversed(range(1, 13)))
         data['Year'] = ['2015', '2016', '2017', '2018']
-        energy_types = [self.models_mapping(self.energy_type)] if self.energy_type != "All" else [Energy, Gas]
-        buildings = [self.building] if self.building != "All" else ['SCH', 'WOR']
+        if self.energy_type != "All":
+            energy_types = [self.models_mapping(self.energy_type)]
+            if self.building != "All":
+                title = self.tra["title"]["single"].format(
+                    energy_type=self.tra["names_title"][self.energy_type],
+                    building=self.tra["names_title"][self.building],
+                    interval=self.tra["names_title"]["All_years"])
+                buildings = [self.building]
+            else:
+                title = self.tra["title"]["both_buildings"].format(
+                    energy_type=self.tra["names_title"][self.energy_type],
+                    building_1=self.tra["names_title"]["SCH"],
+                    building_2=self.tra["names_title"]["WOR"],
+                    interval=self.tra["names_title"]["All_years"])
+                buildings = ['SCH', 'WOR']
+        else:
+            energy_types = [Energy, Gas]
+            if self.building != "All":
+                title = self.tra["title"]["both_mediums"].format(
+                    energy_type_1=self.tra["names_title"]["energy"],
+                    energy_type_2=self.tra["names_title"]["gas"],
+                    building=self.tra["names_title"][self.building],
+                    interval=self.tra["names_title"]["All_years"])
+                buildings = [self.building]
+            else:
+                title = self.tra["title"]["both_mediums_and_buildings"].format(
+                    energy_type_1=self.tra["names_title"]["energy"],
+                    energy_type_2=self.tra["names_title"]["gas"],
+                    building_1=self.tra["names_title"]["SCH"],
+                    building_2=self.tra["names_title"]["WOR"],
+                    interval=self.tra["names_title"]["All_years"])
+                buildings = ['SCH', 'WOR']
 
         for model in energy_types:
             for building in buildings:
                 for row in model.query.filter_by(building=building).all():
                     if model == Energy:
-                        price = row.consumption_price if row.consumption_price is not None else 0\
+                        price = row.consumption_price if row.consumption_price is not None else 0 \
                             + row.transmission_price if row.transmission_price is not None else 0
                     else:
                         price = row.price
@@ -65,7 +100,7 @@ class ChartTool:
             if len(quan) != len(data['Styczeń']):
                 quan.append(0)
             data[k] = [r for r in reversed(data[k])]
-        return data
+        return title, data
 
     def get_data_column_line(self, filters: dict, energy_type: str = None):
         model = self.models_mapping(energy_type)
@@ -132,9 +167,9 @@ class ChartTool:
         self.assert_intervals_correct(school_data_months, workshop_data_months)
         text = {
             "title": self.tra["title"]["both_buildings"].format(energy_type=self.tra["names_title"][self.energy_type],
-                                                        building_1=self.tra["names_title"]["SCH"],
-                                                        building_2=self.tra["names_title"]["WOR"],
-                                                        interval=self.interval),
+                                                                building_1=self.tra["names_title"]["SCH"],
+                                                                building_2=self.tra["names_title"]["WOR"],
+                                                                interval=self.interval),
             "tooltip": {
 
                 "energy_type": {
@@ -149,7 +184,6 @@ class ChartTool:
                     }
             },
             "legend": self.tra["legend"]["both_buildings"]
-
 
         }
         return text, {
@@ -168,8 +202,8 @@ class ChartTool:
         text = {
             "title": self.tra["title"]["both_mediums"].format(energy_type_1=self.tra["names_title"]["energy"],
                                                               energy_type_2=self.tra["names_title"]["gas"],
-                                                        building=self.tra["names_title"][building],
-                                                        interval=self.interval),
+                                                              building=self.tra["names_title"][building],
+                                                              interval=self.interval),
             "tooltip": {
 
                 "energy_type": {
@@ -198,11 +232,12 @@ class ChartTool:
         all_energy_types_all_building_types_data = {**all_school_data, **all_workshop_data}
 
         text = {
-            "title": self.tra["title"]["both_mediums_and_buildings"].format(energy_type_1=self.tra["names_title"]["energy"],
-                                                              energy_type_2=self.tra["names_title"]["gas"],
-                                                                            building_1=self.tra["names_title"]["SCH"],
-                                                                            building_2=self.tra["names_title"]["WOR"],
-                                                        interval=self.interval),
+            "title": self.tra["title"]["both_mediums_and_buildings"].format(
+                energy_type_1=self.tra["names_title"]["energy"],
+                energy_type_2=self.tra["names_title"]["gas"],
+                building_1=self.tra["names_title"]["SCH"],
+                building_2=self.tra["names_title"]["WOR"],
+                interval=self.interval),
             "tooltip": {
 
                 "energy_type": {
