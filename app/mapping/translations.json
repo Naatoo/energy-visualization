@@ -1,0 +1,42 @@
+{
+  "title": {
+    "single": "Koszt {energy_type} w {building} w {interval} [zł]",
+    "both_mediums": "Koszt {energy_type_1} i {energy_type_2} w {building} w {interval} [zł]",
+    "both_buildings": "Koszt {energy_type} w {building_1} i {building_2} w {interval} [zł]",
+    "both_mediums_and_buildings": "Koszt {energy_type_1} i {energy_type_2} w {building_1} i {building_2} w {interval} [zł]"
+  },
+  "names_title": {
+    "gas": "gazu",
+    "energy": "energii elektrycznej",
+    "SCH": "szkole",
+    "WOR": "warsztacie",
+    "All_years": "latach 2015-2018"
+  },
+  "tooltip_labels":{
+    "energy": "Rodzaj energii",
+    "gas": "Rodzaj energii",
+    "WOR": "Budynek",
+    "SCH": "Budynek"
+  },
+  "tooltip_values": {
+    "energy": "Energia elektryczna",
+    "gas": "Gaz",
+    "WOR": "Warsztat",
+    "SCH": "Szkoła"
+  },
+  "legend":{
+    "both_mediums": ["Energia elektryczna", "Gaz"],
+    "both_buildings": ["Szkoła", "Warsztat"],
+    "both_mediums_and_buildings": ["Energia elektryczna w szkole", "Gaz w szkole", "Energia elektryczna w warsztacie", "Gaz w warsztacie"]
+  }
+  }
+
+
+
+
+
+
+
+
+
+
