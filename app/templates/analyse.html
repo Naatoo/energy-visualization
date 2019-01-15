@@ -1,10 +1,10 @@
+{% import "bootstrap/utils.html" as utils %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% extends 'base.html' %}
 
 {% block header %}
 <div class="content-section">
     <div class="center">
-        <h1>Add gas bill</h1>
         <br/>
         {{ wtf.quick_form(form) }}
     </div>
