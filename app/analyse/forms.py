@@ -7,16 +7,18 @@ class ChartForm(FlaskForm):
     """
     Form for users to add new energy bill
     """
-    year = SelectField('Year', validators=[DataRequired()], choices=[("2015", "2015"), ("2016", "2016"),
-                                                                     ("2017", "2017"), ("2018", "2018"),
-                                                                     ("2019", "2019"), ("All", "All"),
-                                                                     ('Avarage', 'Avarage')])
-    building = SelectField('Building', validators=[DataRequired()], choices=[("SCH", "School"), ("WOR", "Workshop"),
-                                                                             ("All", "All")])
-    energy_type = SelectField('Energy type', validators=[DataRequired()], choices=[("energy", "energy"), ("gas", "gas"),
-                                                                                   ("All", "All")])
-    chart_type = SelectField('Chart type', validators=[DataRequired()], choices=[("Column", "Column"), ("Line", "Line"),
-                                                                                 ("Surface", "Surface")])
-    submit = SubmitField('Show')
+    year = SelectField('Okres', validators=[DataRequired()], choices=[("2015", "2015"), ("2016", "2016"),
+                                                                      ("2017", "2017"), ("2018", "2018"),
+                                                                      ("2019", "2019"), ("All", "Wszystkie"),
+                                                                      ('Avarage', 'Średnia')])
+    building = SelectField('Budynek', validators=[DataRequired()], choices=[("SCH", "Szkoła"), ("WOR", "Warsztat"),
+                                                                            ("All", "Wszystkie")])
+    energy_type = SelectField('Rodzaj energii', validators=[DataRequired()],
+                              choices=[("energy", "Energia elektryczna"), ("gas", "Gaz"),
+                                       ("All", "Wszystkie")])
+    chart_type = SelectField('Typ wykresu', validators=[DataRequired()],
+                             choices=[("Column", "Kolumnowy"), ("Line", "Liniowy"),
+                                      ("Surface", "Powierzchniowy")])
+    submit = SubmitField('Wygeneruj wykres')
 
     # TODO: validators

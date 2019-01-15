@@ -8,12 +8,12 @@ class EnergyAdditionForm(FlaskForm):
     """
     Form for users to add new energy bill
     """
-    date = DateField('Date', validators=[DataRequired()])
-    quantity = FloatField('Quantity', validators=[DataRequired()])
-    consumption_price = FloatField('Consumption Price', validators=[DataRequired()])
-    transmission_price = FloatField('Transmission Price', validators=[DataRequired()])
-    building = SelectField('Building', validators=[DataRequired()], choices=[("SCH", "School"), ("WOR", "Workshop")])
-    submit = SubmitField('Add')
+    date = DateField('Data', validators=[DataRequired()])
+    quantity = FloatField('Ilość [kWh]', validators=[DataRequired()])
+    consumption_price = FloatField('Cena za zużycie', validators=[DataRequired()])
+    transmission_price = FloatField('Cena za przesył', validators=[DataRequired()], )
+    building = SelectField('Budynek', validators=[DataRequired()], choices=[("SCH", "Szkoła"), ("WOR", "Warsztat")])
+    submit = SubmitField('Dodaj')
 
     # TODO: validators
 
@@ -22,10 +22,10 @@ class GasAdditionForm(FlaskForm):
     """
     Form for users to add new gas bill
     """
-    date = DateField('Date', validators=[DataRequired()])
-    quantity = FloatField('Quantity', validators=[DataRequired()])
-    price = FloatField('Price', validators=[DataRequired()])
-    building = SelectField('Building', validators=[DataRequired()], choices=[("SCH", "School"), ("WOR", "Workshop")])
-    submit = SubmitField('Add')
+    date = DateField('Data', validators=[DataRequired()])
+    quantity = FloatField('Ilość [m3]', validators=[DataRequired()])
+    price = FloatField('Cena', validators=[DataRequired()])
+    building = SelectField('Budynek', validators=[DataRequired()], choices=[("SCH", "Szkoła"), ("WOR", "Warsztat")])
+    submit = SubmitField('Dodaj')
 
     # TODO: validators
