@@ -56,6 +56,7 @@ def generate_stacked_chart(data: dict, text: dict, width=1200, height=800, chart
     yaxis = LinearAxis()
     plot.add_layout(Grid(dimension=0, ticker=xaxis.ticker))
     plot.add_layout(Grid(dimension=1, ticker=yaxis.ticker))
+    plot.title.text_font_size = '12pt'
     plot.toolbar.logo = None
     plot.min_border_top = 0
     plot.xgrid.grid_line_color = None
@@ -63,6 +64,7 @@ def generate_stacked_chart(data: dict, text: dict, width=1200, height=800, chart
     plot.yaxis.axis_label = text['title']
     plot.ygrid.grid_line_alpha = 0.1
     plot.xaxis.axis_label = "Miesiąc"
+    plot.xaxis.axis_label_text_font_size = "11pt"
     plot.xaxis.major_label_orientation = 1
     return plot
 
