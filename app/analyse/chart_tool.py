@@ -86,7 +86,7 @@ class ChartTool:
                 for row in model.query.filter_by(building=building).all():
                     if model == Energy:
                         price = row.consumption_price if row.consumption_price is not None else 0 \
-                            + row.transmission_price if row.transmission_price is not None else 0
+                                                                                                + row.transmission_price if row.transmission_price is not None else 0
                     else:
                         price = row.price
                     if len(data[self.months_names_mapping[str(row.month)]]) != 4:
@@ -135,7 +135,8 @@ class ChartTool:
         text = {
             "title": self.tra["title"]["single"].format(energy_type=self.tra["names_title"][self.energy_type],
                                                         building=self.tra["names_title"][self.building],
-                                                        interval=self.interval),
+                                                        interval=self.interval if self.interval != "All" else
+                                                        self.tra["names_title"]["All_years"]),
             "tooltip": {
 
                 "energy_type": {
@@ -167,7 +168,8 @@ class ChartTool:
             "title": self.tra["title"]["both_buildings"].format(energy_type=self.tra["names_title"][self.energy_type],
                                                                 building_1=self.tra["names_title"]["SCH"],
                                                                 building_2=self.tra["names_title"]["WOR"],
-                                                                interval=self.interval),
+                                                                interval=self.interval if self.interval != "All" else
+                                                                self.tra["names_title"]["All_years"]),
             "legend": self.tra["legend"]["both_buildings"]
 
         }
@@ -188,7 +190,8 @@ class ChartTool:
             "title": self.tra["title"]["both_mediums"].format(energy_type_1=self.tra["names_title"]["energy"],
                                                               energy_type_2=self.tra["names_title"]["gas"],
                                                               building=self.tra["names_title"][building],
-                                                              interval=self.interval),
+                                                              interval=self.interval if self.interval != "All" else
+                                                              self.tra["names_title"]["All_years"]),
             "legend": self.tra["legend"]["both_mediums"]
         }
         return text, {
@@ -208,7 +211,8 @@ class ChartTool:
                 energy_type_2=self.tra["names_title"]["gas"],
                 building_1=self.tra["names_title"]["SCH"],
                 building_2=self.tra["names_title"]["WOR"],
-                interval=self.interval),
+                interval=self.interval if self.interval != "All" else
+                self.tra["names_title"]["All_years"]),
             "legend": self.tra["legend"]["both_mediums_and_buildings"]
         }
         return text, all_energy_types_all_building_types_data
