@@ -1,4 +1,5 @@
-from flask import request, render_template
+from flask import render_template
+from flask_login import login_required
 
 from app.analyse import analyse
 from app.analyse.forms import ChartForm
@@ -6,7 +7,8 @@ from app.analyse.chart_tool import ChartTool
 from bokeh.embed import components
 
 
-@analyse.route('/', methods=['GET', 'POST'])
+@analyse.route('/analyse', methods=['GET', 'POST'])
+@login_required
 def show():
     """
      Handle requests to the /show route

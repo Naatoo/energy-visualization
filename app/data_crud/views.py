@@ -1,4 +1,5 @@
 from flask import render_template, redirect, url_for
+from flask_login import login_required
 
 from app.data_crud import data
 from app.data_crud.forms import EnergyAdditionForm, GasAdditionForm
@@ -8,6 +9,7 @@ from database import db
 
 
 @data.route('/add/energy', methods=['GET', 'POST'])
+@login_required
 def add_energy():
     """
      Handle requests to the /add/energy route
@@ -29,6 +31,7 @@ def add_energy():
 
 
 @data.route('/add/gas', methods=['GET', 'POST'])
+@login_required
 def add_gas():
     """
      Handle requests to the /add/gas route
